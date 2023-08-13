@@ -6,7 +6,7 @@
 -->
 <html>
 	<head>
-		<title>Multi-modal Multi-channel Speech Separation</title>
+		<title>Ultra Dual-Path Compression For Joint Echo Cancellation and Noise Suppression</title>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
 		<link rel="stylesheet" href="assets/css/main.css" />
@@ -23,141 +23,176 @@
 								<section id="banner">
 									<div class="content">
 										<header>
-											<h2>Multi-modal Multi-channel Speech Separation</h2>
-											<p>Authors: Rongzhi Gu, Shi-Xiong Zhang, Lianwu Chen, Yong Xu, Meng Yu, Yuexian Zou, Dong Yu</p>
+											<h2>Ultra Dual-Path Compression For Joint Echo Cancellation and Noise Suppression</h2>
+											<p>Authors: Hangting Chen, Jianwei Yu, Yi Luo, Rongzhi Gu, Weihua Li, Zhuocheng Lu, Chao Weng</p>
+											<p>Tencent AI Lab, Audio and Speech Signal Processing Oteam</p>
+											<p>Email: chenhangting17@mails.ucas.ac.cn</p>
 										</header>
 										<p>Abstract:
-										 Target speech separation refers to extracting a target speaker's voice from overlapped audios of simultaneous talkers.
-        Previously the use of visual clue for target speech separation has shown great potentials.
-        This paper extends it with a general multi-modal framework in the far-field scenario.
-        The framework leverages all the available information of target speaker, including his/her spatial location, voice characteristics and lip movements.
-        These target-related features are extracted and learned together with the separation task in an end-to-end neural architecture.
-        An important aspect of the multi-modal joint modeling is the form of fusion.
-        A factorized attention-based fusion method is proposed to aggregate different modalities.
-        To validate the robustness of proposed multi-modal system in practice, we evaluate it under different challenging conditions, such as one of the modalities is temporarily missing, invalid or noisy.
-        Experiments are carried out on a large-scale audio-visual dataset collected from YouTube and simulated into multichannels.
-        Evaluation results illustrate that our proposed multi-modal framework significantly outperforms single-modal speech separation approaches, even when the target's location or lip information is temporally missing or corrupted.
+										 Echo cancellation and noise reduction are essential for full-duplex communication, yet most existing neural networks have high computational costs and are inflexible in tuning model complexity. 
+										 In this paper, we introduce time-frequency dual-path compression to achieve a wide range of compression ratios on computational cost. 
+										 Specifically, for frequency compression, trainable filters are used to replace manually designed filters for dimension reduction. 
+										 For time compression, only using frame skipped prediction causes large performance degradation, which can be alleviated by a post-processing network with full sequence modeling. 
+										 We have found that under fixed compression ratios, dual-path compression combining both the time and frequency methods will give further performance improvement, covering compression ratios from 4x to 32x with little model size change. 
+										 Moreover, the proposed models show competitive performance compared with fast FullSubNet and DeepFilterNet.
 										</p>
 										<!--
 										<ul class="actions">
 											<li><a href="#" class="button big">Learn More</a></li>
 										</ul>-->
 									</div>
-									<span class="image object" style="background-size: contain; background-repeat: no-repeat">
-										<img src="images/diagram-20191008.png" style="background-repeat:no-repeat; background-size:contain" width="50%" alt=""/>
-									</span>
+								</section>
+								
+								<section id="poster">
+									<h2>Poster</h2>
+									<tr style="border-top:1px solid black">
+										<td><img id="poster_fig" alt="" width="100%" src="images/poster.png"></td>
+									</tr>
 								</section>
 
 							<!-- Section -->
 								<section id="details">
 									<header class="major">
-										<h2>Details</h2>
+										<h2>A Quick Review</h2>
 									</header>
 									<div class="features">
 										<article>
 											<div class="content">
-												<h3>Dataset</h3>
-												<p>The audio-visual corpus used for experiments is collected from Youtube, in which Mandarin accounts for the vast majority.</p>
-												<p>The simulated dataset contains 160,000, 15,000 and 1,200 multi-channel noisy and reverberant mixtures for
-          training, validation and testing. The speakers in the training set and test set are not overlapped.</p>
+												<h3>Background</h3>
+												<p>Model performance relates to (1) architecture and (2) # params. & computational cost. 
+												When the architecture is determined, the # params as well as the computational cost can be tuned by hyperparameters. </p>
+												<p>AEC&ANS for full-duplex communication needs low computational cost when deployed on PC/Phones.
+												Thus, an important research topic is to lower computational cost while lowering performance degradation.</p>
 											</div>
 										</article>
 										<article>
 											<div class="content">
-												<h3>Simulation</h3>
-												<p>We use a 9-element non-uniform linear array, with spacing 4-3-2-1-1-2-3-4 cm.
-          The Multi-channel audio signals are generated by convolving single-channel signals with RIRs simulated by image-source method (ISM).</p>
-												<p>We consider three scenarios for the synthetic examples generation: 1 speaker, 2 speakers and 3 speakers,
-          respectively accounts for 49%, 30% and 21% in the test dataset.</p>
+												<h3>Experimental setup</h3>
+												<p>Models are trained on a simulated dataset with 100K iterations. Though the model performance can be further improved with a larger iteration number, we adopt such an iteration number for fast comparison.  </p>
+												<p>Models are tested on a semi-simulated dataset, where the echos are real-recorded ones from the AEC challenge.</p>
+												<p>Models have a window size and a hop size of 20ms and 10ms, respectively. Additional look ahead is not allowed due to causal processing.</p>
 											</div>
 										</article>
 										<article>
 											<div class="content">
-												<h3>Framework</h3>
-												<p>As shown in figure above, the proposed system is a multi-stream architecture which takes four inputs: 
-												(i) noisy multi-channel mixture waveforms, 
-												(ii) target speaker's direction calculated by face detection, 
-												(iii) video frames of cropped lip regions, 
-												(iv) enrollment audio(s) of the target speaker. 
-												The system directly outputs estimated monaural target speech, 
-												while all other interfering signals are suppressed.  </p>
+												<h3>Framework & Method</h3>
+												<p>The whole framework consists of a linear AEC (Kalman-filter based), an online DPT-FSNet, compression and decompression modules and a post network.</p>
+												<p>Compression and Decompression are operated on the input spectra and the output features, respectively. 
+													In detail, the compression module compresses the input spectra first along the time axis and then the frequency using linear transform. The time compression uses the past and the current frames while the frequency compression is conducted with the Mel scale.
+													The decompression module decompresses the output feature first along frequency and then the time axis using linear transform. The time decompression predicts the current feature and copies it for future frames.
+													A post network (1-layer GRU) is needed to eliminate the degradation caused by the time compression.
+												</p>
 											</div>
 										</article>
 										<article>
 											<div class="content">
-												<h3>Features</h3>
-												<p>Audio: 1) Speaker-independent features: spectral feature (logrithm power spectrum) and spatial features (inter-channel phase difference).
-												2) Speaker-related feature: directional feature computed with the target speaker's direction. </p>
-												<p>Video: The video stream takes gray image frames of the target speaker's lip region. The structure of lip reading network is similar to the one proposed by [1].
-												It consists of a spatio-temporal convolution layer and a 18-layer ResNet, followed by several video blocks. The output of the video blocks are target speaker's lip embeddings. </p>
-												<p>Speaker Embedding: The speaker model was pretrained on speaker verification task. The input to the speaker model is an enrollment utterance of the target speaker.
-												The speaker model outputs the utterance-level speaker embedding. </p>
+												<h3>Results</h3>
+												<p>1. Time compression needs an ultra-light post-net.</p>
+												<p>2. Dual-path compression performs better than single-path compression.
+												For example, from 1.8G MACs/s to 140M MACs/s, the model achieves a 13x compression ratio but only has 0.22 PESQ drop, 0.16 and 0.14 PESQ higher than single-path compression.</p>
 											</div>
 										</article>
 									</div>
 								</section>
 
+								<section id="results_table">
+									<h2>Detailed results</h2>
+									<tr style="border-top:1px solid black">
+										<td><img id="results_fig" alt="" width="75%" src="images/results.png"></td>
+									</tr>
+								</section>
+
 							<!-- Section -->
-								<section id="spk1">
+								<section id="dt">
 									<header class="major">
-										<h2>1-speaker samples</h2>
+										<h2>Double talk</h2>
 									</header>
 									<div class="posts">
 										<article>
 											<table cellspacing="50" style="width: 50%">
 												<thead>
 													<tr>
-														<th><center>Mixture (1st channel)</center> </th>
-														<th><center>reverberant clean</center> </th>
-														<th><center>audio-only</center> </th>
-														<th><center>audio-visual</center> </th>
-														<th><center>multi-modal</center> </th>
+														<th><center>MIC</center> </th>
+														<th><center>LPB(REF)</center> </th>
+														<th><center>Uncompressed model</center> </th>
+														<th><center>Dual-path</center> </th>
+														<th><center>Dual-path</center> </th>
 													</tr>
 													<tr style="font-size: small">
 														<th>&nbsp;</th>
 														<th>&nbsp; </th>
-														<th><center>(IPD+DF)</center></th>
-														<th><center>(IPD+DF+lip)</center></th>
-														<th><center>(IPD+DF+lip+spk. emb.)</center></th>
+														<th>&nbsp;</center></th>
+														<th><center>T2 x F2</center></th>
+														<th><center>T4 x F4</center></th>
+													</tr>
+													<tr style="font-size: small">
+														<th>&nbsp;</th>
+														<th>&nbsp; </th>
+														<th><center>MACs: 1.8G/s</center></th>
+														<th><center>MACs: 486M/s</center></th>
+														<th><center>MACs: 140M/s</center></th>
 													</tr>
 												</thead>
 												<tbody>
 													<tr style="border-top:1px solid black">
 														<td><audio controls class="audio-player" preload="metadata" style="width:180px;">
-														  <source src="audio/1spk/mix/51-12_1.wav" ></audio></td>
+														  <source src="demos_audios/test_SIRP15_SNRP99_0000001.wav.mix.wav" ></audio></td>
 														<td><audio controls class="audio-player" preload="metadata" style="width:180px;">
-														  <source src="audio/1spk/clean/51-12_11.wav" ></audio></td>
+														  <source src="demos_audios/test_SIRP15_SNRP99_0000001.wav.lpb.wav" ></audio></td>
 														<td><audio controls class="audio-player" preload="metadata" style="width:180px;">
-														  <source src="audio/1spk/audioonly/51-12__21.00.wav" ></audio></td>
+														  <source src="demos_audios/test_SIRP15_SNRP99_0000001.wav.est.1.wav" ></audio></td>
 														<td><audio controls class="audio-player" preload="metadata" style="width:180px;">
-														  <source src="audio/1spk/audiovisual/51-12__22.59.wav" ></audio></td>
+														  <source src="demos_audios/test_SIRP15_SNRP99_0000001.wav.est.4.wav" ></audio></td>
 														<td><audio controls class="audio-player" preload="metadata" style="width:180px;">
-														  <source src="audio/1spk/multimodal/51-12__23.00.wav" ></audio></td>
+														  <source src="demos_audios/test_SIRP15_SNRP99_0000001.wav.est.16.wav" ></audio></td>
 													</tr>
 													<tr style="border-top:1px solid black">
 														<td><audio controls class="audio-player" preload="metadata" style="width:180px;">
-														  <source src="audio/1spk/mix/45-0_1.wav" ></audio></td>
+														  <source src="demos_audios/test_SIRP05_SNRP15_0000001.wav.mix.wav" ></audio></td>
 														<td><audio controls class="audio-player" preload="metadata" style="width:180px;">
-														  <source src="audio/1spk/clean/45-0_11.wav" ></audio></td>
+														  <source src="demos_audios/test_SIRP05_SNRP15_0000001.wav.lpb.wav" ></audio></td>
 														<td><audio controls class="audio-player" preload="metadata" style="width:180px;">
-														  <source src="audio/1spk/audioonly/45-0__24.22.wav" ></audio></td>
+														  <source src="demos_audios/test_SIRP05_SNRP15_0000001.wav.est.1.wav" ></audio></td>
 														<td><audio controls class="audio-player" preload="metadata" style="width:180px;">
-														  <source src="audio/1spk/audiovisual/45-0__24.76.wav" ></audio></td>
+														  <source src="demos_audios/test_SIRP05_SNRP15_0000001.wav.est.4.wav" ></audio></td>
 														<td><audio controls class="audio-player" preload="metadata" style="width:180px;">
-														  <source src="audio/1spk/multimodal/45-0__25.55.wav" ></audio></td>
+														  <source src="demos_audios/test_SIRP05_SNRP15_0000001.wav.est.16.wav" ></audio></td>
 													</tr>
-
 													<tr style="border-top:1px solid black">
 														<td><audio controls class="audio-player" preload="metadata" style="width:180px;">
-														  <source src="audio/1spk/mix/16-19_1.wav" ></audio></td>
+														  <source src="demos_audios/test_SIRP05_SNRP99_0000001.wav.mix.wav" ></audio></td>
 														<td><audio controls class="audio-player" preload="metadata" style="width:180px;">
-														  <source src="audio/1spk/clean/16-19_11.wav" ></audio></td>
+														  <source src="demos_audios/test_SIRP05_SNRP99_0000001.wav.lpb.wav" ></audio></td>
 														<td><audio controls class="audio-player" preload="metadata" style="width:180px;">
-														  <source src="audio/1spk/audioonly/16-19__19.40.wav" ></audio></td>
+														  <source src="demos_audios/test_SIRP05_SNRP99_0000001.wav.est.1.wav" ></audio></td>
 														<td><audio controls class="audio-player" preload="metadata" style="width:180px;">
-														  <source src="audio/1spk/audiovisual/16-19__20.71.wav" ></audio></td>
+														  <source src="demos_audios/test_SIRP05_SNRP99_0000001.wav.est.4.wav" ></audio></td>
 														<td><audio controls class="audio-player" preload="metadata" style="width:180px;">
-														  <source src="audio/1spk/multimodal/16-19__20.89.wav" ></audio></td>
+														  <source src="demos_audios/test_SIRP05_SNRP99_0000001.wav.est.16.wav" ></audio></td>
+													</tr>
+													<tr style="border-top:1px solid black">
+														<td><audio controls class="audio-player" preload="metadata" style="width:180px;">
+														  <source src="demos_audios/test_SIRN05_SNRP15_0000001.wav.mix.wav" ></audio></td>
+														<td><audio controls class="audio-player" preload="metadata" style="width:180px;">
+														  <source src="demos_audios/test_SIRN05_SNRP15_0000001.wav.lpb.wav" ></audio></td>
+														<td><audio controls class="audio-player" preload="metadata" style="width:180px;">
+														  <source src="demos_audios/test_SIRN05_SNRP15_0000001.wav.est.1.wav" ></audio></td>
+														<td><audio controls class="audio-player" preload="metadata" style="width:180px;">
+														  <source src="demos_audios/test_SIRN05_SNRP15_0000001.wav.est.4.wav" ></audio></td>
+														<td><audio controls class="audio-player" preload="metadata" style="width:180px;">
+														  <source src="demos_audios/test_SIRN05_SNRP15_0000001.wav.est.16.wav" ></audio></td>
+													</tr>
+													<tr style="border-top:1px solid black">
+														<td><audio controls class="audio-player" preload="metadata" style="width:180px;">
+														  <source src="demos_audios/test_SIRN05_SNRP99_0000001.wav.mix.wav" ></audio></td>
+														<td><audio controls class="audio-player" preload="metadata" style="width:180px;">
+														  <source src="demos_audios/test_SIRN05_SNRP99_0000001.wav.lpb.wav" ></audio></td>
+														<td><audio controls class="audio-player" preload="metadata" style="width:180px;">
+														  <source src="demos_audios/test_SIRN05_SNRP99_0000001.wav.est.1.wav" ></audio></td>
+														<td><audio controls class="audio-player" preload="metadata" style="width:180px;">
+														  <source src="demos_audios/test_SIRN05_SNRP99_0000001.wav.est.4.wav" ></audio></td>
+														<td><audio controls class="audio-player" preload="metadata" style="width:180px;">
+														  <source src="demos_audios/test_SIRN05_SNRP99_0000001.wav.est.16.wav" ></audio></td>
 													</tr>
 												</tbody>
 											</table>
@@ -170,9 +205,9 @@
 								</section>
 								
 							<!-- Section -->
-								<section id="spk2">
+								<section id="nest">
 									<header class="major">
-										<h2>2-speaker samples</h2>
+										<h2>Near-end single talk</h2>
 									</header>
 									<div class="posts">
 										<article>
@@ -180,96 +215,64 @@
 											<table cellspacing="50" style="width: 50%">
 												<thead>
 													<tr>
-														<th><center>Mixture (1st channel)</center> </th>
-														<th><center>reverberant clean</center> </th>
-														<th><center>audio-only</center> </th>
-														<th><center>audio-visual</center> </th>
-														<th><center>multi-modal</center> </th>
+														<th><center>MIC</center> </th>
+														<th><center>Uncompressed model</center> </th>
+														<th><center>Dual-path</center> </th>
+														<th><center>Dual-path</center> </th>
 													</tr>
 													<tr style="font-size: small">
-														<th>&nbsp;</th>
 														<th>&nbsp; </th>
-														<th><center>(IPD+DF)</center></th>
-														<th><center>(IPD+DF+lip)</center></th>
-														<th><center>(IPD+DF+lip+spk. emb.)</center></th>
+														<th>&nbsp;</center></th>
+														<th><center>T2 x F2</center></th>
+														<th><center>T4 x F4</center></th>
+													</tr>
+													<tr style="font-size: small">
+														<th>&nbsp; </th>
+														<th><center>MACs: 1.8G/s</center></th>
+														<th><center>MACs: 486M/s</center></th>
+														<th><center>MACs: 140M/s</center></th>
 													</tr>
 												</thead>
 												<tbody>
 													<tr style="border-top:1px solid black">
 														<td><audio controls class="audio-player" preload="metadata" style="width:180px;">
-														  <source src="audio/2spk/mix/72-12_1.wav" ></audio></td>
+														  <source src="demos_audios/test_SIRP99_SNRP05_0000000.wav.mix.wav" ></audio></td>
 														<td><audio controls class="audio-player" preload="metadata" style="width:180px;">
-														  <source src="audio/2spk/clean/72-12_12.wav" ></audio></td>
+														  <source src="demos_audios/test_SIRP99_SNRP05_0000000.wav.est.1.wav" ></audio></td>
 														<td><audio controls class="audio-player" preload="metadata" style="width:180px;">
-														  <source src="audio/2spk/audioonly/72-12__11.56.wav" ></audio></td>
+														  <source src="demos_audios/test_SIRP99_SNRP05_0000000.wav.est.4.wav" ></audio></td>
 														<td><audio controls class="audio-player" preload="metadata" style="width:180px;">
-														  <source src="audio/2spk/audiovisual/72-12__12.36.wav" ></audio></td>
-														<td><audio controls class="audio-player" preload="metadata" style="width:180px;">
-														  <source src="audio/2spk/multimodal/72-12__13.40.wav" ></audio></td>
+														  <source src="demos_audios/test_SIRP99_SNRP05_0000000.wav.est.16.wav" ></audio></td>
 													</tr>
 													<tr style="border-top:1px solid black">
 														<td><audio controls class="audio-player" preload="metadata" style="width:180px;">
-														  <source src="audio/2spk/mix/96-25_1.wav" ></audio></td>
+														  <source src="demos_audios/test_SIRP99_SNRP05_0000001.wav.mix.wav" ></audio></td>
 														<td><audio controls class="audio-player" preload="metadata" style="width:180px;">
-														  <source src="audio/2spk/clean/96-25_12.wav" ></audio></td>
+														  <source src="demos_audios/test_SIRP99_SNRP05_0000001.wav.est.1.wav" ></audio></td>
 														<td><audio controls class="audio-player" preload="metadata" style="width:180px;">
-														  <source src="audio/2spk/audioonly/96-25__-6.29.wav" ></audio></td>
+														  <source src="demos_audios/test_SIRP99_SNRP05_0000001.wav.est.4.wav" ></audio></td>
 														<td><audio controls class="audio-player" preload="metadata" style="width:180px;">
-														  <source src="audio/2spk/audiovisual/96-25__0.97.wav" ></audio></td>
-														<td><audio controls class="audio-player" preload="metadata" style="width:180px;">
-														  <source src="audio/2spk/multimodal/96-25__4.52.wav" ></audio></td>
+														  <source src="demos_audios/test_SIRP99_SNRP05_0000001.wav.est.16.wav" ></audio></td>
 													</tr>
-
 													<tr style="border-top:1px solid black">
 														<td><audio controls class="audio-player" preload="metadata" style="width:180px;">
-														  <source src="audio/2spk/mix/98-14_1.wav" ></audio></td>
+														  <source src="demos_audios/test_SIRP99_SNRP15_0000000.wav.mix.wav" ></audio></td>
 														<td><audio controls class="audio-player" preload="metadata" style="width:180px;">
-														  <source src="audio/2spk/clean/98-14_12.wav" ></audio></td>
+														  <source src="demos_audios/test_SIRP99_SNRP15_0000000.wav.est.1.wav" ></audio></td>
 														<td><audio controls class="audio-player" preload="metadata" style="width:180px;">
-														  <source src="audio/2spk/audioonly/98-14__13.37.wav" ></audio></td>
+														  <source src="demos_audios/test_SIRP99_SNRP15_0000000.wav.est.4.wav" ></audio></td>
 														<td><audio controls class="audio-player" preload="metadata" style="width:180px;">
-														  <source src="audio/2spk/audiovisual/98-14__13.59.wav" ></audio></td>
-														<td><audio controls class="audio-player" preload="metadata" style="width:180px;">
-														  <source src="audio/2spk/multimodal/98-14__15.59.wav" ></audio></td>
+														  <source src="demos_audios/test_SIRP99_SNRP15_0000000.wav.est.16.wav" ></audio></td>
 													</tr>
-
 													<tr style="border-top:1px solid black">
 														<td><audio controls class="audio-player" preload="metadata" style="width:180px;">
-														  <source src="audio/2spk/mix/101-11_1.wav" ></audio></td>
+														  <source src="demos_audios/test_SIRP99_SNRP15_0000001.wav.mix.wav" ></audio></td>
 														<td><audio controls class="audio-player" preload="metadata" style="width:180px;">
-														  <source src="audio/2spk/clean/101-11_12.wav" ></audio></td>
+														  <source src="demos_audios/test_SIRP99_SNRP15_0000001.wav.est.1.wav" ></audio></td>
 														<td><audio controls class="audio-player" preload="metadata" style="width:180px;">
-														  <source src="audio/2spk/audioonly/101-11__6.38.wav" ></audio></td>
+														  <source src="demos_audios/test_SIRP99_SNRP15_0000001.wav.est.4.wav" ></audio></td>
 														<td><audio controls class="audio-player" preload="metadata" style="width:180px;">
-														  <source src="audio/2spk/audiovisual/101-11__6.38.wav" ></audio></td>
-														<td><audio controls class="audio-player" preload="metadata" style="width:180px;">
-														  <source src="audio/2spk/multimodal/101-11__11.29.wav" ></audio></td>
-													</tr>
-
-													<tr style="border-top:1px solid black">
-														<td><audio controls class="audio-player" preload="metadata" style="width:180px;">
-														  <source src="audio/2spk/mix/99-4_1.wav" ></audio></td>
-														<td><audio controls class="audio-player" preload="metadata" style="width:180px;">
-														  <source src="audio/2spk/clean/99-4_12.wav" ></audio></td>
-														<td><audio controls class="audio-player" preload="metadata" style="width:180px;">
-														  <source src="audio/2spk/audioonly/99-4__10.79.wav" ></audio></td>
-														<td><audio controls class="audio-player" preload="metadata" style="width:180px;">
-														  <source src="audio/2spk/audiovisual/99-4__13.22.wav" ></audio></td>
-														<td><audio controls class="audio-player" preload="metadata" style="width:180px;">
-														  <source src="audio/2spk/multimodal/99-4__14.32.wav" ></audio></td>
-													</tr>
-
-													<tr style="border-top:1px solid black">
-														<td><audio controls class="audio-player" preload="metadata" style="width:180px;">
-														  <source src="audio/2spk/mix/117-4_1.wav" ></audio></td>
-														<td><audio controls class="audio-player" preload="metadata" style="width:180px;">
-														  <source src="audio/2spk/clean/117-4_12.wav" ></audio></td>
-														<td><audio controls class="audio-player" preload="metadata" style="width:180px;">
-														  <source src="audio/2spk/audioonly/117-4__6.29.wav" ></audio></td>
-														<td><audio controls class="audio-player" preload="metadata" style="width:180px;">
-														  <source src="audio/2spk/audiovisual/117-4__8.66.wav" ></audio></td>
-														<td><audio controls class="audio-player" preload="metadata" style="width:180px;">
-														  <source src="audio/2spk/multimodal/117-4__13.32.wav" ></audio></td>
+														  <source src="demos_audios/test_SIRP99_SNRP15_0000001.wav.est.16.wav" ></audio></td>
 													</tr>
 												</tbody>
 											</table>
@@ -282,79 +285,72 @@
 								</section>
 
 							<!-- Section -->
-								<section id="spk3">
+								<section id="fest">
 									<header class="major">
-										<h2>3-speaker samples</h2>
+										<h2>Far-end single talk</h2>
 									</header>
 									<div class="posts">
 										<article>
 											<table cellspacing="50" style="width: 50%">
 												<thead>
 													<tr>
-														<th><center>Mixture (1st channel)</center> </th>
-														<th><center>reverberant clean</center> </th>
-														<th><center>audio-only</center> </th>
-														<th><center>audio-visual</center> </th>
-														<th><center>multi-modal</center> </th>
+														<th><center>MIC</center> </th>
+														<th><center>LPB(REF)</center> </th>
+														<th><center>Uncompressed model</center> </th>
+														<th><center>Dual-path</center> </th>
+														<th><center>Dual-path</center> </th>
 													</tr>
 													<tr style="font-size: small">
 														<th>&nbsp;</th>
 														<th>&nbsp; </th>
-														<th><center>(IPD+DF)</center></th>
-														<th><center>(IPD+DF+lip)</center></th>
-														<th><center>(IPD+DF+lip+spk. emb.)</center></th>
+														<th>&nbsp;</center></th>
+														<th><center>T2 x F2</center></th>
+														<th><center>T4 x F4</center></th>
+													</tr>
+													<tr style="font-size: small">
+														<th>&nbsp;</th>
+														<th>&nbsp; </th>
+														<th><center>MACs: 1.8G/s</center></th>
+														<th><center>MACs: 486M/s</center></th>
+														<th><center>MACs: 140M/s</center></th>
 													</tr>
 												</thead>
 												<tbody>
 													<tr style="border-top:1px solid black">
 														<td><audio controls class="audio-player" preload="metadata" style="width:180px;">
-														  <source src="audio/3spk/mix/71-11_1.wav" ></audio></td>
+														  <source src="demos_audios/test_SIRN99_SNRP99_0000000.wav.mix.wav" ></audio></td>
 														<td><audio controls class="audio-player" preload="metadata" style="width:180px;">
-														  <source src="audio/3spk/clean/71-11_13.wav" ></audio></td>
+														  <source src="demos_audios/test_SIRN99_SNRP99_0000000.wav.lpb.wav" ></audio></td>
 														<td><audio controls class="audio-player" preload="metadata" style="width:180px;">
-														  <source src="audio/3spk/audioonly/71-11__13.31.wav" ></audio></td>
+														  <source src="demos_audios/test_SIRN99_SNRP99_0000000.wav.est.1.wav" ></audio></td>
 														<td><audio controls class="audio-player" preload="metadata" style="width:180px;">
-														  <source src="audio/3spk/audiovisual/71-11__14.07.wav" ></audio></td>
+														  <source src="demos_audios/test_SIRN99_SNRP99_0000000.wav.est.4.wav" ></audio></td>
 														<td><audio controls class="audio-player" preload="metadata" style="width:180px;">
-														  <source src="audio/3spk/multimodal/71-11__14.59.wav" ></audio></td>
+														  <source src="demos_audios/test_SIRN99_SNRP99_0000000.wav.est.16.wav" ></audio></td>
 													</tr>
 													<tr style="border-top:1px solid black">
 														<td><audio controls class="audio-player" preload="metadata" style="width:180px;">
-														  <source src="audio/3spk/mix/76-11_1.wav" ></audio></td>
+														  <source src="demos_audios/test_SIRN99_SNRP99_0000001.wav.mix.wav" ></audio></td>
 														<td><audio controls class="audio-player" preload="metadata" style="width:180px;">
-														  <source src="audio/3spk/clean/76-11_13.wav" ></audio></td>
+														  <source src="demos_audios/test_SIRN99_SNRP99_0000001.wav.lpb.wav" ></audio></td>
 														<td><audio controls class="audio-player" preload="metadata" style="width:180px;">
-														  <source src="audio/3spk/audioonly/76-11__9.19.wav" ></audio></td>
+														  <source src="demos_audios/test_SIRN99_SNRP99_0000001.wav.est.1.wav" ></audio></td>
 														<td><audio controls class="audio-player" preload="metadata" style="width:180px;">
-														  <source src="audio/3spk/audiovisual/76-11__9.50.wav" ></audio></td>
+														  <source src="demos_audios/test_SIRN99_SNRP99_0000001.wav.est.4.wav" ></audio></td>
 														<td><audio controls class="audio-player" preload="metadata" style="width:180px;">
-														  <source src="audio/3spk/multimodal/76-11__10.12.wav" ></audio></td>
+														  <source src="demos_audios/test_SIRN99_SNRP99_0000001.wav.est.16.wav" ></audio></td>
 													</tr>
-
 													<tr style="border-top:1px solid black">
 														<td><audio controls class="audio-player" preload="metadata" style="width:180px;">
-														  <source src="audio/3spk/mix/31-1_1.wav" ></audio></td>
+														  <source src="demos_audios/test_SIRN99_SNRP99_0000002.wav.mix.wav" ></audio></td>
 														<td><audio controls class="audio-player" preload="metadata" style="width:180px;">
-														  <source src="audio/3spk/clean/31-1_13.wav" ></audio></td>
+														  <source src="demos_audios/test_SIRN99_SNRP99_0000002.wav.lpb.wav" ></audio></td>
 														<td><audio controls class="audio-player" preload="metadata" style="width:180px;">
-														  <source src="audio/3spk/audioonly/31-1__8.27.wav" ></audio></td>
+														  <source src="demos_audios/test_SIRN99_SNRP99_0000002.wav.est.1.wav" ></audio></td>
 														<td><audio controls class="audio-player" preload="metadata" style="width:180px;">
-														  <source src="audio/3spk/audiovisual/31-1__11.06.wav" ></audio></td>
+														  <source src="demos_audios/test_SIRN99_SNRP99_0000002.wav.est.4.wav" ></audio></td>
 														<td><audio controls class="audio-player" preload="metadata" style="width:180px;">
-														  <source src="audio/3spk/multimodal/31-1__11.44.wav" ></audio></td>
-													</tr>
-
-												<tr style="border-top:1px solid black">
-														<td><audio controls class="audio-player" preload="metadata" style="width:180px;">
-														  <source src="audio/3spk/mix/80-25_1.wav" ></audio></td>
-														<td><audio controls class="audio-player" preload="metadata" style="width:180px;">
-														  <source src="audio/3spk/clean/80-25_13.wav" ></audio></td>
-														<td><audio controls class="audio-player" preload="metadata" style="width:180px;">
-														  <source src="audio/3spk/audioonly/80-25__-5.42.wav" ></audio></td>
-														<td><audio controls class="audio-player" preload="metadata" style="width:180px;">
-														  <source src="audio/3spk/audiovisual/80-25__-5.23.wav" ></audio></td>
-														<td><audio controls class="audio-player" preload="metadata" style="width:180px;">
-														  <source src="audio/3spk/multimodal/80-25__4.98.wav" ></audio></td>
+														  <source src="demos_audios/test_SIRN99_SNRP99_0000002.wav.est.16.wav" ></audio></td>
 													</tr>
 												</tbody>
 											</table>
@@ -366,36 +362,26 @@
 								</section>
 
 							<!-- Section -->
-								<section id="wild">
+								<section id="rtf_test">
 									<header class="major">
-										<h2>Real recorded samples</h2>
+										<h2>Real-time factor (RTF) test</h2>
 									</header>
 									<div class="posts">
 										<article>
-											<table cellspacing="50" style="width: 50%">
+											<table cellspacing="50" style="width: 100%">
 												<thead>
 													<tr>
-														<th> Unprocessed Mixture</th>
-														<th> Estimated speaker 1</th>
-														<th> Estimated speaker 2</th>
+														<th> RTF test on Intel(R) Core(TM) i7-9700 CPU @ 3.00GHz using a model with 13x compression rato (T4 x F4) </th>
+													</tr>
+													<tr>
+														<th> The test is carried with frame-by-frame process to mimic real-world online processing.</th>
 													</tr>
 												</thead>
 												<tbody>
 													<tr style="border-top:1px solid black">
-														<td><video id="mixture_video" width="380" controls>
-														  <source src="video/mixture.mp4" ></video></td>
-														<td><video id="spk_left_video" width="380" controls>
-														  <source src="video/spk_left.mp4" ></video></td>
-														<td><video id="spk_right_video" width="380" controls>
-														  <source src="video/spk_right.mp4" ></video></td>
+														<td><video id="rtf_test_video" width="150%" controls>
+														  <source src="video/rtf_test.webm" ></video></td>
 													</tr>
-													
-													<tr style="border-top:1px solid black">
-														<td><img id="mixture_spec" alt="" width="380" src="video/mixture_spec.png"></td>
-														<td><img id="spk_left_spec" alt="" width="380" src="video/spk_left_spec.png"></td>
-														<td><img id="spk_right_spec" alt="" width="380" src="video/spk_right_spec.png"></td>
-													</tr>
-													
 													
 												</tbody>
 											</table>
@@ -406,8 +392,25 @@
 									</div>
 								</section>
 
+							<!-- Section -->
+							<section>
+								<header class="major">
+									<h2>Related works</h2>
+								</header>
+								<p>[1] F. Dang, H. Chen, and P. Zhang, 
+									“Dpt-fsnet: Dual-path transformer based full-band and sub-band fusion network for speech enhancement,” 
+									in 2022 IEEE International Conference on Acoustics, Speech and Signal Processing, ICASSP 2022. IEEE, 202</p>
+								<p>[2] S. Zhang, Z. Wang, J. Sun, Y. Fu, B. Tian, Q. Fu, and L. Xie,
+									“Multi-task deep residual echo suppression with echo-aware loss,” 
+									in IEEE International Conference on Acoustics, Speech and Signal Processing, ICASSP 2022, Virtual and Singapore, 23-27 May 2022. IEEE, 2022, pp. 9127–9
+								</p>
+								<p>[3] X. Hao and X. Li, 
+									“Fast fullsubnet: Accelerate full-band and subband fusion model for single-channel speech enhancement,” arXiv preprint arXiv:2212.09019, 2022
+								</p>
+							</section>
 						</div>
 					</div>
+
 
 				<!-- Sidebar -->
 					<div id="sidebar">
@@ -426,40 +429,31 @@
 									</header>
 									<ul>
 										<li><a href="#banner">Abstract</a></li>
-										<li><a href="#details">Details</a></li>
+										<li><a href="#poster">Poster</a></li>
+										<li><a href="#details">A Quick Review</a></li>
+										<li><a href="#results_table">Detailed results</a></li>
 										<li>
-											<span class="opener">Audio-visual samples</span>
+											<span class="opener">Audio samples</span>
 											<ul>
-												<li><a href="#spk1">1-speaker samples</a></li>
-												<li><a href="#spk2">2-speaker samples</a></li>
-												<li><a href="#spk3">3-speaker samples</a></li>
-												<li><a href="#wild">real recorded samples</a></li>
+												<li><a href="#dt">Double talk</a></li>
+												<li><a href="#nest">Near-end single talk</a></li>
+												<li><a href="#fest">Far-end single talk</a></li>
+												<li><a href="#rtf_test">Real-time factor (RTF) test</a></li>
 											</ul>
 										</li>
 									</ul>
 								</nav>
 
-							<!-- Section -->
-								<section>
-									<header class="major">
-										<h2>Related works</h2>
-									</header>
-									<p>[1] Afouras Triantafyllos, Joon Son Chung, and Andrew Zisserman.
-										"The Conversation: Deep Audio-Visual Speech Enhancement." Proc. Interspeech 2018 (2018): 3244-3248.</p>
-
-									<p>[2] Wu Jian, et al. "Time Domain Audio Visual Speech Separation." arXiv preprint arXiv:1904.03760 (2019).
-										<strong><a href="https://funcwj.github.io/online-demo/page/tavs/">Demos</a></strong></p>
-
-									<p>[3] Tan Ke, et al. "Audio-Visual Speech Separation and Dereverberation with a Two-Stage Multimodal Network." arXiv preprint arXiv:1909.07352 (2019).
-										<strong><a href="https://jupiterethan.github.io/av-enh.github.io/">Demos</a></strong></p>
-
-								</section>
-
 
 								<footer id="footer">
-									<p class="copyright">
-										<center>© Oct. 2019 </center>
-										<img src="images/pku_icon2.png" height="50px" alt="">&nbsp;<img src="images/tencent_icon.png" height="50px" alt="">
+									<p>
+										<center>Created by Hangting Chen </center>
+									</p>
+									<p>
+										<center>Augest 13th, 2023</center>
+									</p>
+									<p class="copyright" style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
+										<img src="images/tencent_icon.png" width="50%" alt="">
 									</p>
 
 								</footer>
